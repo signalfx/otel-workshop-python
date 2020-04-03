@@ -1,0 +1,8 @@
+Flask==1.1.1
+requests==2.23.0
+opentelemetry-api==0.6b0
+opentelemetry-ext-http-requests==0.6b0
+opentelemetry-ext-otcollector==0.6b0
+opentelemetry-ext-wsgi==0.6b0
+opentelemetry-sdk==0.6b0
+git+https://github.com/owais/opentelemetry-python.git#egg=opentelemetry-ext-zipkin&subdirectory=ext/opentelemetry-ext-zipkin

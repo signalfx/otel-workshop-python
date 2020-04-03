@@ -1,0 +1,21 @@
+{
+  "install": "pip3 install -r app/requirements.txt",
+  "start": "python3 app/main.py",
+  "watch": {
+    "ignore": [
+      "\\.pyc$"
+    ],
+    "install": {
+      "include": [
+        "app_instrumented/requirements\\.txt$",
+        "app/requirements\\.txt$",
+        "^\\.env$"
+      ]
+    },
+    "restart": {
+      "include": [
+        "\\.py$"
+      ]
+    }
+  }
+}
