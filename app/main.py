@@ -19,4 +19,4 @@ def fetch_from_node():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8082)
+    app.run(debug=True, port=3000)
