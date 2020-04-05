@@ -1,9 +1,10 @@
 ## Python Service
 
-This app listens on port `3000` and exposes a single endpoint at `/` that
-responds with the string `hello from python`. For every request it receives, it
-calls the Node service at `http://localhost:8081/` and appends the response
-from the Python service it's own response.
+This app listens on port `3000` (443 when accessing from outside glitch) and
+exposes a single endpoint at `/` that responds with the string `hello from
+python`. For every request it receives, it calls the Node service at
+`http://localhost:8081/` and appends the response from the Python service it's
+own response.
 
 The following modifications can be made:
 

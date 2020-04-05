@@ -2,7 +2,7 @@
 
 .PHONY: run
 run:
-	. venv/bin/activate; flask run
+	venv/bin/flask run
 
 .PHONY: install
 install: venv

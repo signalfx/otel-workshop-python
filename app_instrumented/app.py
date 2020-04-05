@@ -49,11 +49,7 @@ def hello():
 
 def fetch_from_node():
     try:
-        r = requests.get('http://'
-                         + os.getenv("REQUEST_HOST")
-                         + ':'
-                         + os.getenv("REQUEST_PORT")
-                         + '/')
+        r = requests.get('http://' + os.getenv("NODE_REQUEST_ENDPOINT") + '/')
     except Exception:
         return "error fetching from node"
     return r.text
