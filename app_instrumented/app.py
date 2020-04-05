@@ -43,7 +43,7 @@ app.wsgi_app = OpenTelemetryMiddleware(app.wsgi_app)
 def hello():
     with tracer.start_as_current_span("fetch-from-node"):
         response = fetch_from_node()
-        return "hello from python\n" + response
+        return "hello from python<br>" + response
 
 
 def fetch_from_node():
