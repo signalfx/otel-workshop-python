@@ -3,8 +3,8 @@
 This app listens on port `3000` (443 when accessing from outside glitch) and
 exposes a single endpoint at `/` that responds with the string `hello from
 python`. For every request it receives, it calls the Node service at
-`http://localhost:8081/` and appends the response from the Python service it's
-own response.
+`https://signalfx-otel-workshop-node.glitch.me` and appends the response
+from the Python service it's own response.
 
 The following modifications can be made:
 
@@ -15,14 +15,14 @@ This modifications make it possible to run this workshop in other environments.
 For example, to run locally in Docker, the following changes could be made:
 
 * In `.flaskenv` set the listen port to `3001`
-* In `.env` set the call host to `host.docker.internal`
+* In `.env` set the call host to `http://host.docker.internal:3002`
 
 ## Running the app
 
 You'll need Python 3 and Make to be able to run the service.
 
 Install the prerequisites by running `make install`. Next, run `make run` and
-then go to http://localhost:3000 to access the app.
+then go to https://signalfx-otel-workshop-python.glitch.me to access the app.
 
 ## Instrumenting Python HTTP server and client with OpenTelemetry
 
