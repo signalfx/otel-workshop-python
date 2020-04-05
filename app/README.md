@@ -1,22 +1,40 @@
 ## Python Service
 
-This app listens on port `8082` and exposes a single endpoint at `/` that resposds with the string `hello from python`. For every request it receives, it calls the Node service at `http://localhost:8081/` and appends the response from the Python service it's own response.
+This app listens on port `3000` (443 when accessing from outside glitch) and
+exposes a single endpoint at `/` that responds with the string `hello from
+python`. For every request it receives, it calls the Node service at
+`http://localhost:8081/` and appends the response from the Python service it's
+own response.
+
+The following modifications can be made:
+
+* The listen port can be modified by editing `.flaskenv`
+* The call host and port can be modified by editing `.env`
+
+This modifications make it possible to run this workshop in other environments.
+For example, to run locally in Docker, the following changes could be made:
+
+* In `.flaskenv` set the listen port to `3001`
+* In `.env` set the call host to `host.docker.internal`
 
 ## Running the app
 
-You'll need Python 3 and Make to be able to run the service. 
+You'll need Python 3 and Make to be able to run the service.
 
-Run `make run` and then go to http://localhost:8082 to access the app.
+Install the prerequisites by running `make install`. Next, run `make run` and
+then go to http://localhost:3000 to access the app.
 
 ## Instrumenting Python HTTP server and client with OpenTelemetry
 
 ### 1. Install the required opentelemetry packages
 
 ```bash
-venv/bin/pip install opentelemetry-ext-http-requests opentelemetry-ext-otcollector opentelemetry-ext-wsgi opentelemetry-sdk
+venv/bin/pip install opentelemetry-ext-http-requests \
+    opentelemetry-ext-otcollector opentelemetry-ext-wsgi \
+    opentelemetry-sdk
 ```
 
-### 2. Import packages required for instrumenting our Python app.
+### 2. Import packages required for instrumenting our Python app
 
 ```diff
 import requests
@@ -29,7 +47,7 @@ from flask import Flask
 +from opentelemetry.ext.wsgi import OpenTelemetryMiddleware
 ```
 
-### 3. Configure the tracer and exporter 
+### 3. Configure the tracer and exporter
 
 ```diff
 import requests
@@ -42,16 +60,17 @@ from opentelemetry.sdk.trace.export import BatchExportSpanProcessor
 from opentelemetry.ext.wsgi import OpenTelemetryMiddleware
 
 
-+# configure tracer and exporter
-+ot_exporter = CollectorSpanExporter(
++span_exporter = CollectorSpanExporter(
 +    service_name="py-service",
-+    endpoint="localhost:55678",
++    endpoint=os.getenv("SPAN_EXPORTER_HOST")
++                       + ':'
++                       + os.getenv("SPAN_EXPORTER_PORT"),
 +)
 
 +provider = TracerProvider()
 +trace.set_tracer_provider(provider)
 +tracer = trace.get_tracer(__name__)
-+provider.add_span_processor(BatchExportSpanProcessor(ot_exporter))
++provider.add_span_processor(BatchExportSpanProcessor(span_exporter))
 
 app = Flask(__name__)
 ```
@@ -76,7 +95,7 @@ app = Flask(__name__)
 def hello():
 ```
 
-#### 5. Add a manual span to record an interesting operation. 
+#### 5. Add a manual span to record an interesting operation.
 
 ```diff
 @app.route("/")
@@ -88,6 +107,9 @@ def hello():
 -     return "hello from python\n" + response
 ```
 
-This will make our app generate a second span with operation name as `fetch-from-node`. The span will be a child of the previous auto-generated span.
+This will make our app generate a second span with operation name as
+`fetch-from-node`. The span will be a child of the previous auto-generated
+span.
 
-We can run the app again and this time it should emit spans to locally running OpenTelemetry collector.
+We can run the app again and this time it should emit spans to a locally running
+OpenTelemetry Collector.

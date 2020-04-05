@@ -1,3 +1,4 @@
+import os
 import requests
 from flask import Flask
 
@@ -12,11 +13,7 @@ def hello():
 
 def fetch_from_node():
     try:
-        r = requests.get('http://localhost:8081/')
+        r = requests.get('http://' + os.getenv("NODE_REQUEST_ENDPOINT") + '/')
     except requests.exceptions.ConnectionError:
         return 'error fetching from node'
     return r.text
-
-
-if __name__ == "__main__":
-    app.run(debug=True, port=3000)

@@ -1,8 +1,9 @@
+import os
 import requests
-from flask import Flask, request
+from flask import Flask
 from opentelemetry import trace
-from opentelemetry import propagators, trace
-from opentelemetry.ext.otcollector.trace_exporter import CollectorSpanExporter
+from opentelemetry import propagators
+#from opentelemetry.ext.otcollector.trace_exporter import CollectorSpanExporter
 from opentelemetry.ext import http_requests
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchExportSpanProcessor
@@ -10,36 +11,26 @@ from opentelemetry.ext.wsgi import OpenTelemetryMiddleware
 from opentelemetry.ext.zipkin import ZipkinSpanExporter
 
 
-# configure tracer and exporter
-#exporter = CollectorSpanExporter(
+#span_exporter = CollectorSpanExporter(
 #    service_name="py-service",
-#    endpoint="localhost:55678",
+#    endpoint=os.getenv("SPAN_EXPORTER_HOST")
+#                       + ':'
+#                       + os.getenv("SPAN_EXPORTER_PORT"),
 #)
-exporter = ZipkinSpanExporter(
-    service_name="py-service",
-    # optional:
-    host_name="localhost",
-    port=9411,
-    # endpoint="api/v2/spans",
-    protocol="http",
-    # ipv4="",
-    # ipv6="",
-    # retry=False,
-)
 
-exporter = ZipkinSpanExporter(
+span_exporter = ZipkinSpanExporter(
     service_name="py-service",
-    host_name="signalfx-otel-workshop-collector.glitch.me",
-    port=443,
-    endpoint="/api/v2/spans",
-    protocol="https",
+    host_name=os.getenv("SPAN_EXPORTER_HOST"),
+    port=int(os.getenv("SPAN_EXPORTER_PORT")),
+    endpoint=os.getenv("SPAN_EXPORTER_ENDPOINT"),
+    protocol=os.getenv("SPAN_EXPORTER_PROTOCOL"),
 )
 
 
 provider = TracerProvider()
 trace.set_tracer_provider(provider)
 tracer = trace.get_tracer(__name__)
-provider.add_span_processor(BatchExportSpanProcessor(exporter))
+provider.add_span_processor(BatchExportSpanProcessor(span_exporter))
 
 # instrument http client
 http_requests.enable(provider)
@@ -58,11 +49,7 @@ def hello():
 
 def fetch_from_node():
     try:
-        r = requests.get('http://localhost:8081/')
+        r = requests.get('http://' + os.getenv("NODE_REQUEST_ENDPOINT") + '/')
     except Exception:
         return "error fetching from node"
     return r.text
-
-
-if __name__ == "__main__":
-    app.run(debug=True, port=3000)
