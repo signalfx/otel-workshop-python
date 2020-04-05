@@ -13,8 +13,8 @@ from opentelemetry.ext.zipkin import ZipkinSpanExporter
 #span_exporter = CollectorSpanExporter(
 #    service_name="py-service",
 #    endpoint=os.getenv("SPAN_EXPORTER_HOST")
-#                       + ':'
-#                       + os.getenv("SPAN_EXPORTER_PORT"),
+#             + ':'
+#             + os.getenv("SPAN_EXPORTER_PORT"),
 #)
 
 span_exporter = ZipkinSpanExporter(
