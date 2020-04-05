@@ -7,14 +7,14 @@ python`. For every request it receives, it should call the Node service at
 
 The following modifications can be made:
 
-* The listen port can be modified by editing `.flaskenv`
+* The `FLASK_RUN_PORT` can be modified by editing `.flaskenv`
 * The call destination can be modified by setting  `NODE_REQUEST_ENDPOINT` in `.env`
 
 The `.flaskenv` and `.env` files can be used to allow this workshop to be run
 in other environments. For example, to run locally, the following changes could
 be made:
 
-* In `.flaskenv` set the listen port to `3001`
+* In `.flaskenv` set the `FLASK_RUN_PORT` to `3001`
 * In `.env` set the `NODE_REQUEST_ENDPOINT` to `http://localhost:3002`
 
 To run in Docker, set `NODE_REQUEST_ENDPOINT` to `http://host.docker.internal:3002`
@@ -69,7 +69,7 @@ Note: The recommended deployment model for OpenTelemetry is to have
 applications export in OpenTelemetry (OTLP) format to the OpenTelemetry
 Collector and have the OpenTelemetry Collector send to your back-end(s) of
 choice. OTLP uses gRPC and unfortunately it does not appear Glitch supports
-gRPC In addition, the OpenTelemetry Python instrumentation only supports
+gRPC. In addition, the OpenTelemetry Python instrumentation only supports
 OpenCensus format (this should be updated shortly). As a result, this workshop
 emits in Zipkin format.
 

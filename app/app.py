@@ -8,7 +8,7 @@ app = Flask(__name__)
 @app.route("/")
 def hello():
     response = fetch_from_node()
-    return "hello from python\n" + response
+    return "hello from python<br>" + response
 
 
 def fetch_from_node():
