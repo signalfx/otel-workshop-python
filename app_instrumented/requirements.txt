@@ -5,4 +5,5 @@ opentelemetry-ext-http-requests==0.6b0
 opentelemetry-ext-otcollector==0.6b0
 opentelemetry-ext-wsgi==0.6b0
 opentelemetry-sdk==0.6b0
+python-dotenv==0.12.0
 git+https://github.com/open-telemetry/opentelemetry-python.git#egg=opentelemetry-ext-zipkin&subdirectory=ext/opentelemetry-ext-zipkin
