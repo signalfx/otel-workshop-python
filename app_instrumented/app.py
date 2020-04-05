@@ -2,7 +2,6 @@ import os
 import requests
 from flask import Flask
 from opentelemetry import trace
-from opentelemetry import propagators
 #from opentelemetry.ext.otcollector.trace_exporter import CollectorSpanExporter
 from opentelemetry.ext import http_requests
 from opentelemetry.sdk.trace import TracerProvider
