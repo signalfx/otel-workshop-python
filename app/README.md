@@ -55,12 +55,15 @@ extension for this workshop.
 
 ```diff
 import requests
-from flask import Flask
+from flask import Flask, request
 +from opentelemetry import trace
 +#from opentelemetry.ext.otcollector.trace_exporter import CollectorSpanExporter
 +from opentelemetry.ext import http_requests
 +from opentelemetry.sdk.trace import TracerProvider
 +from opentelemetry.sdk.trace.export import BatchExportSpanProcessor
++from opentelemetry.sdk.metrics import Counter, Measure, MeterProvider
++from opentelemetry.sdk.metrics.export import ConsoleMetricsExporter 
++from opentelemetry.sdk.metrics.export.controller import PushController
 +from opentelemetry.ext.wsgi import OpenTelemetryMiddleware
 +from opentelemetry.ext.zipkin import ZipkinSpanExporter
 ```
@@ -73,7 +76,7 @@ gRPC. In addition, the OpenTelemetry Python instrumentation only supports
 OpenCensus format (this should be updated shortly). As a result, this workshop
 emits in Zipkin format.
 
-### 3. Configure the tracer and exporter
+### 3. Configure the tracer, metrics and exporters
 
 ```diff
 import requests
@@ -83,10 +86,13 @@ from opentelemetry import trace
 from opentelemetry.ext import http_requests
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchExportSpanProcessor
+from opentelemetry.sdk.metrics import Counter, Measure, MeterProvider
+from opentelemetry.sdk.metrics.export import ConsoleMetricsExporter 
+from opentelemetry.sdk.metrics.export.controller import PushController
 from opentelemetry.ext.wsgi import OpenTelemetryMiddleware
 from opentelemetry.ext.zipkin import ZipkinSpanExporter
 
-
++# setup traces
 +#span_exporter = CollectorSpanExporter(
 +#    service_name="py-service",
 +#    endpoint=os.getenv("SPAN_EXPORTER_HOST")
@@ -107,6 +113,22 @@ from opentelemetry.ext.zipkin import ZipkinSpanExporter
 +tracer = trace.get_tracer(__name__)
 +provider.add_span_processor(BatchExportSpanProcessor(span_exporter))
 
+
++# setup metrics
++metrics.set_meter_provider(MeterProvider())
++meter = metrics.get_meter(__name__)
++exporter = ConsoleMetricsExporter()
++controller = PushController(meter, exporter, 5)
+
++requests_counter = meter.create_metric(
++    name="requests",
++    description="number of requests",
++    unit="1",
++    value_type=int,
++    metric_type=Counter,
++    label_keys=("path",),
++)
+
 app = Flask(__name__)
 ```
 
@@ -123,10 +145,17 @@ SPAN_EXPORTER_PROTOCOL=https
 ### 4. Instrument flask and requests packages to automatically generate spans
 
 ```diff
-provider = TracerProvider()
-trace.set_tracer_provider(provider)
-tracer = trace.get_tracer(__name__)
-provider.add_span_processor(BatchExportSpanProcessor(span_exporter))
+exporter = ConsoleMetricsExporter()
+controller = PushController(meter, exporter, 5)
+
+requests_counter = meter.create_metric(
+    name="requests",
+    description="number of requests",
+    unit="1",
+    value_type=int,
+    metric_type=Counter,
+    label_keys=("path",),
+)
 
 +# instrument http client
 +http_requests.enable(provider)
@@ -157,6 +186,20 @@ def hello():
 This will make our app generate a second span with the operation name
 `fetch-from-node`. The span will be a child of the previous auto-generated
 span.
+
+#### 6. Record metrics on every incoming request
+
+```diff
+@app.route("/")
+def hello():
+    with tracer.start_as_current_span("fetch-from-node"):
++        requests_counter.add(1, {"path": request.path})
+        response = fetch_from_node()
+        return "hello from python<br>" + response
+```
+
+This will make our app record the total number of requests received as a metric.
+
 
 We can run the app again and this time it should emit spans to a locally
 running OpenTelemetry Collector.
