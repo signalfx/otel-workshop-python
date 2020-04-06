@@ -1,6 +1,6 @@
 {
   "install": "pip3 install -r app/requirements.txt",
-  "start": "python3 app/main.py",
+  "start": "cd app; flask run",
   "watch": {
     "ignore": [
       "\\.pyc$"
