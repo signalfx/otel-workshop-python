@@ -8,16 +8,16 @@ python`. For every request it receives, it should call the Node service at
 The following modifications can be made:
 
 * The `FLASK_RUN_PORT` can be modified by editing `.flaskenv`
-* The call destination can be modified by setting  `NODE_REQUEST_ENDPOINT` in `.env`
+* The call destination can be modified by setting  `NODE_ENDPOINT` in `.env`
 
 The `.flaskenv` and `.env` files can be used to allow this workshop to be run
 in other environments. For example, to run locally, the following changes could
 be made:
 
 * In `.flaskenv` set the `FLASK_RUN_PORT` to `3001`
-* In `.env` set the `NODE_REQUEST_ENDPOINT` to `http://localhost:3002`
+* In `.env` set the `NODE_ENDPOINT` to `http://localhost:3002`
 
-To run in Docker, set `NODE_REQUEST_ENDPOINT` to `http://host.docker.internal:3002`
+To run in Docker, set `NODE_ENDPOINT` to `http://host.docker.internal:3002`
 
 ## Running the app
 
