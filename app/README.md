@@ -38,13 +38,21 @@ Your task is to instrument this application using [OpenTelemetry
 Python](https://github.com/open-telemetry/opentelemetry-python). If you get
 stuck, check out the `app_instrumented` directory.
 
-### 1. Install the required opentelemetry packages
+### 1. Add the required opentelemetry packages
 
-```bash
-venv/bin/pip install opentelemetry-ext-http-requests \
-    opentelemetry-ext-otcollector opentelemetry-ext-wsgi \
-    opentelemetry-sdk
+```diff
+Flask==1.1.1
+requests==2.23.0
++opentelemetry-api==0.6b0
++opentelemetry-ext-http-requests==0.6b0
++opentelemetry-ext-otcollector==0.6b0
++opentelemetry-ext-wsgi==0.6b0
++opentelemetry-sdk==0.6b0
+python-dotenv==0.12.0
++git+https://github.com/open-telemetry/opentelemetry-python.git#egg=opentelemetry-ext-zipkin&subdirectory=ext/opentelemetry-ext-zipkin
 ```
+
+Run `make install` to install the dependencies when running locally. Glitch automates this step.
 
 Note: You will also find a Flask extension. This is a new extension that is not
 as feature rich as the WSGI extension today. In order to show some of the
@@ -112,7 +120,6 @@ from opentelemetry.ext.zipkin import ZipkinSpanExporter
 +trace.set_tracer_provider(provider)
 +tracer = trace.get_tracer(__name__)
 +provider.add_span_processor(BatchExportSpanProcessor(span_exporter))
-
 
 +# setup metrics
 +metrics.set_meter_provider(MeterProvider())
